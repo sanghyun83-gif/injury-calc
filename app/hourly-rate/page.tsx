@@ -2,40 +2,30 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, TrendingUp, Calculator, DollarSign } from "lucide-react";
+import { ArrowLeft, TrendingUp, Calculator, Info } from "lucide-react";
 import {
     SITE,
     calculateSETax,
     formatCurrency,
     parseFormattedNumber,
-    formatNumber,
 } from "../site-config";
 
-const DEFAULT_WEEKS = 48; // Assume 4 weeks vacation
+const DEFAULT_WEEKS = 48;
 const DEFAULT_HOURS = 40;
-const DEFAULT_EXPENSES_RATE = 0.10; // 10% for expenses
+const DEFAULT_EXPENSES_RATE = 0.10;
 
 function calculateHourlyRate(targetIncome: number, weeksPerYear: number, hoursPerWeek: number, expenseRate: number) {
-    // Calculate total taxes at target income
     const taxResult = calculateSETax(targetIncome);
     const totalTax = taxResult.totalTax;
     const effectiveTaxRate = totalTax / targetIncome;
 
-    // Calculate billable hours
     const billableHours = weeksPerYear * hoursPerWeek;
-    const utilizationRate = 0.75; // Assume 75% of time is billable
+    const utilizationRate = 0.75;
     const actualBillableHours = billableHours * utilizationRate;
 
-    // Gross income needed (target + taxes + expenses)
     const grossNeeded = targetIncome / (1 - effectiveTaxRate - expenseRate);
-
-    // Minimum hourly rate
     const minHourlyRate = grossNeeded / actualBillableHours;
-
-    // Break-even rate (no profit margin)
     const breakEvenRate = targetIncome / actualBillableHours;
-
-    // Recommended rate (with 20% buffer)
     const recommendedRate = minHourlyRate * 1.2;
 
     return {
@@ -57,6 +47,15 @@ export default function HourlyRatePage() {
     const [hours, setHours] = useState(DEFAULT_HOURS.toString());
     const [result, setResult] = useState<ReturnType<typeof calculateHourlyRate> | null>(null);
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value.replace(/[^0-9]/g, "");
+        if (raw === "") {
+            setIncome("");
+            return;
+        }
+        setIncome(parseInt(raw).toLocaleString("en-US"));
+    };
+
     const handleCalculate = () => {
         const targetIncome = parseFormattedNumber(income);
         const weeksNum = parseInt(weeks) || DEFAULT_WEEKS;
@@ -67,93 +66,89 @@ export default function HourlyRatePage() {
         }
     };
 
-    const handleInputChange = (value: string) => {
-        const num = parseFormattedNumber(value);
-        setIncome(num > 0 ? formatNumber(num) : "");
-    };
-
     return (
-        <main className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-slate-50">
             {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-10">
-                <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
-                        <ArrowLeft className="w-5 h-5" />
-                        <span className="font-medium">{SITE.name}</span>
+            <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+                <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
+                    <Link href="/" className="text-slate-400 hover:text-slate-600 transition-colors">
+                        <ArrowLeft className="w-6 h-6" />
                     </Link>
-                    <span className="text-sm text-indigo-600 font-medium">{SITE.year}</span>
+                    <div className="flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-indigo-600" />
+                        <span className="text-lg font-bold text-slate-900">Hourly Rate Calculator</span>
+                    </div>
+                    <span className="ml-auto text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">
+                        {SITE.year}
+                    </span>
                 </div>
             </header>
 
-            <div className="max-w-4xl mx-auto px-4 py-8">
-                {/* Title */}
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
-                        <TrendingUp className="w-4 h-4" />
-                        Hourly Rate Calculator
-                    </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <main className="max-w-2xl mx-auto px-4 py-8">
+                {/* Calculator Card */}
+                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                    <h1 className="text-xl font-bold text-slate-900 mb-2">
                         Freelance Hourly Rate Calculator
                     </h1>
-                    <p className="text-gray-600">
+                    <p className="text-sm text-slate-500 mb-6">
                         Calculate the hourly rate you need to meet your income goals
                     </p>
-                </div>
 
-                {/* Calculator Card */}
-                <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
-                    <div className="space-y-4">
+                    {/* Inputs */}
+                    <div className="space-y-4 mb-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
                                 Target Annual Take-Home Income
                             </label>
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
                                 <input
                                     type="text"
                                     value={income}
-                                    onChange={(e) => handleInputChange(e.target.value)}
+                                    onChange={handleInputChange}
                                     onKeyDown={(e) => e.key === "Enter" && handleCalculate()}
-                                    className="w-full pl-8 pr-4 py-4 text-xl font-semibold border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                     placeholder="80,000"
+                                    className="w-full pl-8 pr-4 py-4 text-lg border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                                 />
                             </div>
-                            <p className="text-sm text-gray-500 mt-1">How much you want to take home after taxes</p>
+                            <p className="text-xs text-slate-400 mt-1">How much you want to take home after taxes</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
                                     Weeks per Year
                                 </label>
                                 <input
                                     type="number"
                                     value={weeks}
                                     onChange={(e) => setWeeks(e.target.value)}
-                                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                     placeholder="48"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">Account for vacation</p>
+                                <p className="text-xs text-slate-400 mt-1">Account for vacation</p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
                                     Hours per Week
                                 </label>
                                 <input
                                     type="number"
                                     value={hours}
                                     onChange={(e) => setHours(e.target.value)}
-                                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                     placeholder="40"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">Total work hours</p>
+                                <p className="text-xs text-slate-400 mt-1">Total work hours</p>
                             </div>
                         </div>
                     </div>
 
+                    {/* Calculate Button */}
                     <button
                         onClick={handleCalculate}
-                        className="w-full mt-6 bg-indigo-600 text-white py-4 rounded-xl font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2"
+                        disabled={!income}
+                        className="w-full py-4 bg-indigo-600 text-white rounded-lg font-semibold text-lg hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                     >
                         <Calculator className="w-5 h-5" />
                         Calculate Hourly Rate
@@ -162,91 +157,109 @@ export default function HourlyRatePage() {
 
                 {/* Results */}
                 {result && (
-                    <>
-                        {/* Rate Cards */}
-                        <div className="grid md:grid-cols-3 gap-4 mb-6">
-                            <div className="bg-gray-100 rounded-2xl p-5 text-center">
-                                <p className="text-sm text-gray-600 mb-1">Break-Even Rate</p>
-                                <div className="text-2xl font-bold text-gray-700">${result.breakEvenRate}/hr</div>
-                                <p className="text-xs text-gray-500 mt-1">No taxes/expenses</p>
-                            </div>
-                            <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-5 text-center text-white">
-                                <p className="text-sm text-indigo-200 mb-1">Minimum Rate</p>
-                                <div className="text-3xl font-bold">${result.minHourlyRate}/hr</div>
-                                <p className="text-xs text-indigo-200 mt-1">Covers taxes + expenses</p>
-                            </div>
-                            <div className="bg-green-600 rounded-2xl p-5 text-center text-white">
-                                <p className="text-sm text-green-200 mb-1">Recommended Rate</p>
-                                <div className="text-2xl font-bold">${result.recommendedRate}/hr</div>
-                                <p className="text-xs text-green-200 mt-1">+20% buffer</p>
+                    <div className="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        {/* Summary Header */}
+                        <div className="bg-indigo-600 text-white p-6">
+                            <p className="text-sm text-indigo-200 mb-1">Minimum Hourly Rate</p>
+                            <p className="text-4xl font-bold">${result.minHourlyRate}/hr</p>
+                            <p className="text-sm text-indigo-200 mt-2">
+                                Covers taxes + expenses • Recommended: ${result.recommendedRate}/hr
+                            </p>
+                        </div>
+
+                        {/* Recommended Rate Highlight */}
+                        <div className="p-4 bg-emerald-50 border-b border-emerald-100">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-emerald-800">Recommended Rate (+20% buffer)</p>
+                                    <p className="text-xs text-emerald-600">Annual: {formatCurrency(result.annualAtRecommended)}</p>
+                                </div>
+                                <p className="text-2xl font-bold text-emerald-700">${result.recommendedRate}/hr</p>
                             </div>
                         </div>
 
-                        {/* Breakdown */}
-                        <div className="bg-white rounded-2xl shadow-sm border overflow-hidden mb-6">
-                            <div className="p-4 border-b bg-gray-50">
-                                <h3 className="font-semibold text-gray-900">Calculation Breakdown</h3>
-                            </div>
-                            <div className="divide-y">
-                                <div className="p-4 flex justify-between">
-                                    <span className="text-gray-600">Target Take-Home</span>
-                                    <span className="font-medium">{formatCurrency(result.targetIncome)}</span>
+                        {/* Detailed Breakdown */}
+                        <div className="p-6">
+                            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+                                Calculation Breakdown
+                            </h3>
+
+                            <div className="space-y-3 text-sm">
+                                <div className="flex justify-between pb-3 border-b border-slate-100">
+                                    <span className="text-slate-600">Target Take-Home</span>
+                                    <span className="font-medium text-slate-900">{formatCurrency(result.targetIncome)}</span>
                                 </div>
-                                <div className="p-4 flex justify-between">
-                                    <span className="text-gray-600">Estimated Taxes ({result.effectiveTaxRate}%)</span>
+                                <div className="flex justify-between pb-3 border-b border-slate-100">
+                                    <span className="text-slate-600">Estimated Taxes ({result.effectiveTaxRate}%)</span>
                                     <span className="text-red-600">+{formatCurrency(result.totalTax)}</span>
                                 </div>
-                                <div className="p-4 flex justify-between">
-                                    <span className="text-gray-600">Business Expenses (10%)</span>
+                                <div className="flex justify-between pb-3 border-b border-slate-100">
+                                    <span className="text-slate-600">Business Expenses (10%)</span>
                                     <span className="text-red-600">+{formatCurrency(Math.round(result.grossNeeded * 0.1))}</span>
                                 </div>
-                                <div className="p-4 flex justify-between bg-gray-50">
-                                    <span className="font-semibold text-gray-900">Gross Revenue Needed</span>
-                                    <span className="font-semibold">{formatCurrency(result.grossNeeded)}</span>
+                                <div className="flex justify-between pb-3 border-b border-slate-100">
+                                    <span className="font-medium text-slate-900">Gross Revenue Needed</span>
+                                    <span className="font-medium text-slate-900">{formatCurrency(result.grossNeeded)}</span>
                                 </div>
-                                <div className="p-4 flex justify-between">
-                                    <span className="text-gray-600">Billable Hours (75% utilization)</span>
-                                    <span className="font-medium">{result.billableHours} hrs/year</span>
+                                <div className="flex justify-between pb-3 border-b border-slate-100">
+                                    <span className="text-slate-600">Billable Hours (75% utilization)</span>
+                                    <span className="font-medium text-slate-900">{result.billableHours} hrs/year</span>
                                 </div>
-                                <div className="p-4 flex justify-between bg-indigo-50">
-                                    <span className="font-bold text-gray-900">Minimum Hourly Rate</span>
-                                    <span className="font-bold text-indigo-600 text-xl">${result.minHourlyRate}/hr</span>
+                                <div className="flex justify-between pt-2 font-bold text-lg">
+                                    <span className="text-slate-900">Minimum Hourly Rate</span>
+                                    <span className="text-indigo-600">${result.minHourlyRate}/hr</span>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Ad Placeholder */}
-                        <div className="bg-gray-100 rounded-xl p-8 text-center text-gray-400 text-sm mb-8">
-                            Advertisement
-                        </div>
-                    </>
+                    </div>
                 )}
 
+                {/* Ad Placeholder */}
+                <div className="my-8 p-6 bg-white border border-slate-200 rounded-xl text-center">
+                    <p className="text-sm text-slate-400">Advertisement</p>
+                </div>
+
                 {/* FAQ Section */}
-                <div className="bg-white rounded-2xl shadow-sm border p-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-                    <div className="space-y-6">
+                <section className="mt-8 bg-white rounded-xl border border-slate-200 p-6">
+                    <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <Info className="w-5 h-5 text-indigo-600" />
+                        Frequently Asked Questions
+                    </h2>
+
+                    <div className="space-y-4 text-sm">
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-2">Why is my hourly rate so high?</h3>
-                            <p className="text-gray-600 text-sm">
+                            <h3 className="font-semibold text-slate-900 mb-1">
+                                Why is my hourly rate so high?
+                            </h3>
+                            <p className="text-slate-600">
                                 As a freelancer, you pay both employer and employee portions of taxes (15.3% SE tax), plus you have business expenses. You also can't bill 100% of your time.
                             </p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-2">What is utilization rate?</h3>
-                            <p className="text-gray-600 text-sm">
+                            <h3 className="font-semibold text-slate-900 mb-1">
+                                What is utilization rate?
+                            </h3>
+                            <p className="text-slate-600">
                                 Utilization rate is the percentage of your work time that's actually billable. Industry average is 60-80%. Non-billable time includes admin, marketing, and learning.
                             </p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gray-900 mb-2">Should I charge more than the minimum?</h3>
-                            <p className="text-gray-600 text-sm">
+                            <h3 className="font-semibold text-slate-900 mb-1">
+                                Should I charge more than the minimum?
+                            </h3>
+                            <p className="text-slate-600">
                                 Yes! The minimum rate is the break-even point. Add a buffer for slow months, retirement savings, and profit margin. We recommend at least 20% above minimum.
                             </p>
                         </div>
                     </div>
-                </div>
-            </div>
+                </section>
+
+                {/* Disclaimer */}
+                <p className="mt-8 text-xs text-slate-400 text-center">
+                    This calculator provides estimates for informational purposes only.
+                    Consult a qualified tax professional for personalized advice.
+                </p>
+            </main>
 
             {/* Schema.org */}
             <script
@@ -268,6 +281,6 @@ export default function HourlyRatePage() {
                     }),
                 }}
             />
-        </main>
+        </div>
     );
 }
