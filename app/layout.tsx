@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     "DUI fines by state",
     "SR-22 insurance",
   ],
+  verification: {
+    google: "qlPMVO_Hb-be3_hFHNT9SBbsHO-b_wCOfWfLmTb4EQc",
+  },
   openGraph: {
     title: "Free DUI Cost Calculator 2025 | DUI Calculator",
     description: "Calculate the true cost of a DUI in your state. Fines, lawyer fees, insurance increases, and more.",
