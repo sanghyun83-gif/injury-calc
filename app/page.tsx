@@ -1,159 +1,167 @@
+"use client";
+
 import Link from "next/link";
+import { Scale, AlertTriangle, ArrowRight, Shield, FileWarning } from "lucide-react";
 import { SITE, CALCULATORS } from "./site-config";
 
 export default function HomePage() {
-  const featuredCalculators = CALCULATORS.filter((c) => c.featured);
-  const otherCalculators = CALCULATORS.filter((c) => !c.featured);
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="border-b border-slate-100">
-        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-xl font-bold text-slate-900 tracking-tight"
-          >
-            {SITE.name}
-          </Link>
-          <span className="text-sm text-slate-400">{SITE.tagline}</span>
+    <div className="min-h-screen bg-slate-900">
+      {/* Hero Section */}
+      <header className="bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <Scale className="w-10 h-10 text-red-400" />
+            <h1 className="text-3xl md:text-4xl font-bold">{SITE.name}</h1>
+          </div>
+
+          <p className="text-xl text-slate-300 mb-4">
+            Free DUI Cost Calculator for All 50 States
+          </p>
+
+          <p className="text-slate-400 max-w-2xl mx-auto mb-8">
+            {SITE.description}
+          </p>
+
+          {/* Warning Badge */}
+          <div className="inline-flex items-center gap-2 bg-red-900/50 text-red-300 px-4 py-2 rounded-full text-sm mb-8">
+            <AlertTriangle className="w-4 h-4" />
+            Average DUI costs $10,000 - $25,000+
+          </div>
+
+          {/* CTA Button */}
+          <div>
+            <Link
+              href="/dui-cost"
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg shadow-red-900/50"
+            >
+              <Scale className="w-5 h-5" />
+              Calculate Your DUI Cost
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          <p className="text-xs text-slate-500 mt-4">
+            Updated for {SITE.year} • No signup required
+          </p>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-16 px-6 border-b border-slate-100">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
-            Free Financial Calculators
-          </h1>
-          <p className="text-lg text-slate-500 max-w-xl">
-            Calculate taxes, estimate payments, and plan your finances with our
-            free, accurate tools built for US freelancers and self-employed
-            professionals.
-          </p>
+      {/* Stats Section */}
+      <section className="bg-slate-800 py-8 border-y border-slate-700">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-2xl md:text-3xl font-bold text-red-400">1.5M</p>
+              <p className="text-sm text-slate-400">DUI Arrests/Year</p>
+            </div>
+            <div>
+              <p className="text-2xl md:text-3xl font-bold text-red-400">$15K+</p>
+              <p className="text-sm text-slate-400">Average Cost</p>
+            </div>
+            <div>
+              <p className="text-2xl md:text-3xl font-bold text-red-400">3 Years</p>
+              <p className="text-sm text-slate-400">Insurance Impact</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Featured Calculators */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        {featuredCalculators.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-6">
-              Featured Tools
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {featuredCalculators.map((calc) => {
-                const IconComponent = calc.icon;
-                return (
-                  <Link
-                    key={calc.id}
-                    href={`/${calc.id}`}
-                    className="group flex items-start gap-4 p-6 rounded-xl border border-slate-200 bg-white hover:border-indigo-300 hover:shadow-md transition-all duration-200"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center transition-colors">
-                      <IconComponent className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                        {calc.name}
-                      </p>
-                      <p className="text-sm text-slate-500 mt-1">
-                        {calc.description}
-                      </p>
-                      <p className="text-xs text-indigo-600 mt-2 font-medium">
-                        Updated for {SITE.year} →
-                      </p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        )}
+      {/* Calculator Cards */}
+      <main className="max-w-4xl mx-auto px-4 py-12">
+        <h2 className="text-xl font-bold text-white mb-6 text-center">
+          DUI Calculators & Tools
+        </h2>
 
-        {/* Other Calculators (for future expansion) */}
-        {otherCalculators.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-6">
-              More Tools
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {otherCalculators.map((calc) => {
-                const IconComponent = calc.icon;
-                return (
-                  <Link
-                    key={calc.id}
-                    href={`/${calc.id}`}
-                    className="group flex items-center gap-3 p-4 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all duration-200"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 group-hover:bg-slate-200 flex items-center justify-center transition-colors">
-                      <IconComponent className="w-5 h-5 text-slate-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-900">
-                        {calc.shortName}
-                      </p>
-                      <p className="text-xs text-slate-400">{calc.category}</p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* Ad Placeholder */}
-        <section className="my-12">
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl text-center">
-            <p className="text-sm text-slate-400">Advertisement</p>
-          </div>
-        </section>
-
-        {/* SEO Content */}
-        <section className="mt-16 prose prose-slate max-w-none">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">
-            Why Use FinCalc?
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6 text-sm text-slate-600">
-            <div className="p-4 bg-slate-50 rounded-lg">
-              <h3 className="font-semibold text-slate-900 mb-2">
-                ✓ 2025 IRS Rates
-              </h3>
-              <p>
-                Updated with the latest federal tax brackets and self-employment
-                tax limits for accurate calculations.
-              </p>
-            </div>
-            <div className="p-4 bg-slate-50 rounded-lg">
-              <h3 className="font-semibold text-slate-900 mb-2">
-                ✓ 100% Free
-              </h3>
-              <p>
-                No signup, no hidden fees. Calculate your taxes instantly
-                without providing personal information.
-              </p>
-            </div>
-            <div className="p-4 bg-slate-50 rounded-lg">
-              <h3 className="font-semibold text-slate-900 mb-2">
-                ✓ Freelancer Focused
-              </h3>
-              <p>
-                Built specifically for 1099 contractors, freelancers, and
-                self-employed professionals.
-              </p>
-            </div>
-          </div>
-        </section>
+        <div className="grid md:grid-cols-2 gap-4">
+          {CALCULATORS.map((calc) => {
+            const IconComponent = calc.icon;
+            return (
+              <Link
+                key={calc.id}
+                href={`/${calc.id}`}
+                className={`bg-slate-800 hover:bg-slate-750 border ${calc.featured ? 'border-red-600' : 'border-slate-700'
+                  } rounded-xl p-6 transition-all hover:border-red-500 group`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-lg ${calc.featured ? 'bg-red-900/50' : 'bg-slate-700'
+                    }`}>
+                    <IconComponent className={`w-6 h-6 ${calc.featured ? 'text-red-400' : 'text-slate-400'
+                      }`} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-white group-hover:text-red-400 transition-colors">
+                      {calc.name}
+                      {calc.featured && (
+                        <span className="ml-2 text-xs bg-red-600 text-white px-2 py-0.5 rounded">
+                          Popular
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-sm text-slate-400 mt-1">
+                      {calc.description}
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-slate-600 group-hover:text-red-400 transition-colors" />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </main>
 
+      {/* What's Included Section */}
+      <section className="bg-slate-800 py-12 border-y border-slate-700">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl font-bold text-white mb-8 text-center">
+            What&apos;s Included in a DUI Cost?
+          </h2>
+
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { label: "Court Fines", range: "$500 - $5,000" },
+              { label: "Lawyer Fees", range: "$2,500 - $10,000" },
+              { label: "Insurance Increase", range: "$4,000 - $10,000" },
+              { label: "DUI Programs", range: "$500 - $2,000" },
+              { label: "License Fees", range: "$200 - $800" },
+              { label: "Ignition Interlock", range: "$500 - $2,000" },
+            ].map((item, i) => (
+              <div key={i} className="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                <p className="text-slate-400 text-sm">{item.label}</p>
+                <p className="text-white font-semibold mt-1">{item.range}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Disclaimer */}
+      <section className="max-w-4xl mx-auto px-4 py-8">
+        <div className="bg-amber-900/30 border border-amber-700/50 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5" />
+            <div>
+              <p className="text-amber-200 font-medium">Legal Disclaimer</p>
+              <p className="text-amber-300/70 text-sm mt-1">
+                This calculator provides estimates only. Actual DUI costs vary by state, case circumstances, and legal representation. This is not legal advice. Consult a qualified DUI attorney for your specific situation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="border-t border-slate-100 py-8 px-6 mt-12">
-        <div className="max-w-4xl mx-auto text-center text-sm text-slate-400">
-          <p className="mb-2">
-            © {SITE.year} {SITE.name}. For informational purposes only.
+      <footer className="bg-slate-900 border-t border-slate-800 py-8">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Scale className="w-5 h-5 text-red-500" />
+            <span className="font-semibold text-white">{SITE.name}</span>
+          </div>
+          <p className="text-sm text-slate-500">
+            Free DUI Cost Calculator • {SITE.year} Data • All 50 States
           </p>
-          <p>
-            Consult a qualified tax professional for personalized advice.
+          <p className="text-xs text-slate-600 mt-2">
+            © {SITE.year} {SITE.name}. For informational purposes only.
           </p>
         </div>
       </footer>
@@ -164,10 +172,16 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "WebSite",
+            "@type": "WebApplication",
             name: SITE.name,
             description: SITE.description,
-            url: "https://fin-calc.vercel.app",
+            applicationCategory: "FinanceApplication",
+            operatingSystem: "Any",
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "USD",
+            },
           }),
         }}
       />

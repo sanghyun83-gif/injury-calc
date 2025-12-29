@@ -1,234 +1,267 @@
 // ============================================
-// FIN-CALC SITE CONFIGURATION
-// All tax rates and calculator logic centralized here
-// Easy to update yearly - just change the constants
+// DUI-CALC SITE CONFIGURATION
+// DUI Cost Calculator for all 50 US States
+// 2025 data - easy yearly updates
 // ============================================
 
-import { FileText, Calculator, TrendingUp, Wallet, PiggyBank, Home } from 'lucide-react';
+import { Scale, FileWarning, Shield, Car } from 'lucide-react';
 
 // ============================================
 // SITE METADATA
 // ============================================
 export const SITE = {
-    name: "FinCalc",
-    tagline: "Free Financial Calculators",
-    description: "Free tax calculators for US freelancers and self-employed.",
+    name: "DUI Calculator",
+    tagline: "Free DUI Cost Estimator",
+    description: "Calculate the true cost of a DUI in your state. Free 2025 DUI cost calculator with fines, lawyer fees, insurance increases, and more.",
     year: 2025,
+    baseUrl: "https://dui-calc.vercel.app",
 };
 
 // ============================================
-// 2025 FEDERAL TAX BRACKETS (SINGLE FILER)
-// Source: IRS Revenue Procedure 2024-40
+// 2025 DUI COST CONSTANTS (National Averages)
+// Sources: NHTSA, State DMV websites, Legal databases
 // ============================================
-export const TAX_BRACKETS_2025 = [
-    { min: 0, max: 11925, rate: 0.10 },
-    { min: 11925, max: 48475, rate: 0.12 },
-    { min: 48475, max: 103350, rate: 0.22 },
-    { min: 103350, max: 197300, rate: 0.24 },
-    { min: 197300, max: 250525, rate: 0.32 },
-    { min: 250525, max: 626350, rate: 0.35 },
-    { min: 626350, max: Infinity, rate: 0.37 },
-] as const;
-
-// ============================================
-// 2025 SELF-EMPLOYMENT TAX CONSTANTS
-// Source: IRS & SSA 2025 Updates
-// ============================================
-export const SE_TAX_2025 = {
-    // Social Security: 12.4% (employer + employee portions)
-    socialSecurityRate: 0.124,
-    // 2025 Social Security wage base limit
-    socialSecurityLimit: 176100,
-    // Medicare: 2.9% (no limit)
-    medicareRate: 0.029,
-    // Additional Medicare: 0.9% for high earners
-    additionalMedicareRate: 0.009,
-    additionalMedicareThreshold: 200000,
-    // SE tax is calculated on 92.35% of net earnings
-    netEarningsMultiplier: 0.9235,
-    // You can deduct 50% of SE tax from gross income
-    deductionRate: 0.5,
-    // 2025 Standard deduction for single filers
-    standardDeduction: 15000,
+export const DUI_COSTS_2025 = {
+    // Court & Legal
+    courtFiling: { min: 150, max: 500 },
+    lawyerFirstOffense: { min: 2500, max: 5000 },
+    lawyerSecondOffense: { min: 5000, max: 10000 },
+    lawyerThirdOffense: { min: 10000, max: 25000 },
+    
+    // Fines (varies widely by state)
+    fineFirstOffense: { min: 500, max: 2000 },
+    fineSecondOffense: { min: 1000, max: 5000 },
+    fineThirdOffense: { min: 2000, max: 10000 },
+    
+    // DUI Programs
+    duiSchool: { min: 250, max: 800 },
+    alcoholAssessment: { min: 100, max: 300 },
+    treatmentProgram: { min: 1000, max: 5000 },
+    
+    // DMV & License
+    licenseReinstatement: { min: 100, max: 500 },
+    srFiling: { min: 15, max: 50 }, // SR-22 filing fee
+    
+    // Ignition Interlock Device (IID)
+    iidInstallation: { min: 100, max: 200 },
+    iidMonthly: { min: 75, max: 150 },
+    iidDuration: { months: 6 }, // minimum for first offense
+    
+    // Insurance Impact (3 years)
+    insuranceIncreasePercent: 80, // Average 80% increase
+    averageAnnualPremium: 1800,
+    insuranceYears: 3,
+    
+    // Jail & Bail
+    bailFirstOffense: { min: 500, max: 2500 },
+    bailSecondOffense: { min: 2500, max: 10000 },
+    
+    // Towing & Impound
+    towing: { min: 150, max: 400 },
+    impoundPerDay: { min: 30, max: 75 },
+    impoundDays: 3, // average
+    
+    // Lost Wages (during court, classes, license suspension)
+    lostWageDays: 3,
+    averageDailyWage: 200,
 } as const;
 
 // ============================================
-// CALCULATION RESULT TYPE
+// STATE-SPECIFIC DATA (Top 10 states by population)
 // ============================================
-export interface TaxCalculationResult {
-    grossIncome: number;
-    netEarnings: number;
-    socialSecurityTax: number;
-    medicareTax: number;
-    additionalMedicare: number;
-    totalSETax: number;
-    seDeduction: number;
-    standardDeduction: number;
-    taxableIncome: number;
-    federalTax: number;
-    totalTax: number;
-    quarterlyPayment: number;
-    effectiveRate: string;
-    brackets: { rate: number; amount: number }[];
+export const STATE_DATA: Record<string, {
+    name: string;
+    fineFirst: number;
+    fineSecond: number;
+    licenseFirst: string;
+    licenseSecond: string;
+    mandatoryJail: boolean;
+    iidRequired: boolean;
+}> = {
+    CA: { name: "California", fineFirst: 1800, fineSecond: 3000, licenseFirst: "6 months", licenseSecond: "2 years", mandatoryJail: false, iidRequired: true },
+    TX: { name: "Texas", fineFirst: 2000, fineSecond: 4000, licenseFirst: "1 year", licenseSecond: "2 years", mandatoryJail: false, iidRequired: true },
+    FL: { name: "Florida", fineFirst: 1000, fineSecond: 2000, licenseFirst: "180 days", licenseSecond: "5 years", mandatoryJail: false, iidRequired: true },
+    NY: { name: "New York", fineFirst: 1000, fineSecond: 5000, licenseFirst: "6 months", licenseSecond: "1 year", mandatoryJail: false, iidRequired: true },
+    PA: { name: "Pennsylvania", fineFirst: 300, fineSecond: 1500, licenseFirst: "1 year", licenseSecond: "1 year", mandatoryJail: false, iidRequired: true },
+    IL: { name: "Illinois", fineFirst: 2500, fineSecond: 2500, licenseFirst: "1 year", licenseSecond: "5 years", mandatoryJail: false, iidRequired: true },
+    OH: { name: "Ohio", fineFirst: 1075, fineSecond: 1625, licenseFirst: "1-3 years", licenseSecond: "1-7 years", mandatoryJail: true, iidRequired: true },
+    GA: { name: "Georgia", fineFirst: 1000, fineSecond: 1000, licenseFirst: "1 year", licenseSecond: "3 years", mandatoryJail: true, iidRequired: true },
+    NC: { name: "North Carolina", fineFirst: 200, fineSecond: 2000, licenseFirst: "1 year", licenseSecond: "4 years", mandatoryJail: false, iidRequired: true },
+    MI: { name: "Michigan", fineFirst: 500, fineSecond: 1000, licenseFirst: "180 days", licenseSecond: "1 year", mandatoryJail: false, iidRequired: true },
+    // Add more states as needed
+    OTHER: { name: "Other State", fineFirst: 1000, fineSecond: 2500, licenseFirst: "6-12 months", licenseSecond: "1-2 years", mandatoryJail: false, iidRequired: true },
+};
+
+// ============================================
+// DUI CALCULATION RESULT TYPE
+// ============================================
+export interface DUICalculationResult {
+    // Input summary
+    state: string;
+    offense: 'first' | 'second' | 'third';
+    bac: number;
+    accident: boolean;
+    
+    // Cost breakdown
+    courtFees: number;
+    lawyerFees: number;
+    fines: number;
+    duiPrograms: number;
+    licenseRelated: number;
+    iidCosts: number;
+    insuranceIncrease: number;
+    towingImpound: number;
+    lostWages: number;
+    
+    // Totals
+    totalMinimum: number;
+    totalMaximum: number;
+    totalAverage: number;
+    
+    // Additional info
+    licenseSuspension: string;
+    mandatoryJail: boolean;
 }
 
 // ============================================
-// SELF-EMPLOYMENT TAX CALCULATION
+// DUI COST CALCULATION FUNCTION
 // ============================================
-export function calculateSETax(grossIncome: number): TaxCalculationResult {
-    const {
-        socialSecurityRate,
-        socialSecurityLimit,
-        medicareRate,
-        additionalMedicareRate,
-        additionalMedicareThreshold,
-        netEarningsMultiplier,
-        deductionRate,
-        standardDeduction,
-    } = SE_TAX_2025;
-
-    // 1. Net earnings for SE tax (92.35% of gross)
-    const netEarnings = grossIncome * netEarningsMultiplier;
-
-    // 2. Social Security tax (capped at limit)
-    const ssTaxableIncome = Math.min(netEarnings, socialSecurityLimit);
-    const socialSecurityTax = ssTaxableIncome * socialSecurityRate;
-
-    // 3. Medicare tax (no limit)
-    const medicareTax = netEarnings * medicareRate;
-
-    // 4. Additional Medicare (over threshold)
-    const additionalMedicare =
-        netEarnings > additionalMedicareThreshold
-            ? (netEarnings - additionalMedicareThreshold) * additionalMedicareRate
-            : 0;
-
-    // 5. Total SE tax
-    const totalSETax = socialSecurityTax + medicareTax + additionalMedicare;
-
-    // 6. SE tax deduction (50%)
-    const seDeduction = totalSETax * deductionRate;
-
-    // 7. Taxable income for federal tax
-    const taxableIncome = Math.max(0, grossIncome - seDeduction - standardDeduction);
-
-    // 8. Federal income tax (progressive brackets)
-    let federalTax = 0;
-    let remainingIncome = taxableIncome;
-    const brackets: { rate: number; amount: number }[] = [];
-
-    for (const bracket of TAX_BRACKETS_2025) {
-        if (remainingIncome <= 0) break;
-        const bracketWidth = bracket.max - bracket.min;
-        const taxableInBracket = Math.min(remainingIncome, bracketWidth);
-        const taxInBracket = taxableInBracket * bracket.rate;
-        federalTax += taxInBracket;
-        brackets.push({ rate: bracket.rate * 100, amount: Math.round(taxInBracket) });
-        remainingIncome -= taxableInBracket;
+export function calculateDUICost(
+    stateCode: string,
+    offense: 'first' | 'second' | 'third',
+    bac: number,
+    hasAccident: boolean
+): DUICalculationResult {
+    const costs = DUI_COSTS_2025;
+    const stateInfo = STATE_DATA[stateCode] || STATE_DATA.OTHER;
+    
+    // Multiplier for high BAC (over 0.15)
+    const highBACMultiplier = bac >= 0.15 ? 1.5 : 1;
+    const accidentMultiplier = hasAccident ? 1.3 : 1;
+    const combinedMultiplier = highBACMultiplier * accidentMultiplier;
+    
+    // Court fees
+    const courtFees = Math.round((costs.courtFiling.min + costs.courtFiling.max) / 2);
+    
+    // Lawyer fees based on offense
+    let lawyerFees: number;
+    if (offense === 'first') {
+        lawyerFees = Math.round((costs.lawyerFirstOffense.min + costs.lawyerFirstOffense.max) / 2 * combinedMultiplier);
+    } else if (offense === 'second') {
+        lawyerFees = Math.round((costs.lawyerSecondOffense.min + costs.lawyerSecondOffense.max) / 2 * combinedMultiplier);
+    } else {
+        lawyerFees = Math.round((costs.lawyerThirdOffense.min + costs.lawyerThirdOffense.max) / 2 * combinedMultiplier);
     }
-
-    // 9. Total tax & quarterly payment
-    const totalTax = totalSETax + federalTax;
-    const quarterlyPayment = totalTax / 4;
-
-    // 10. Effective tax rate
-    const effectiveRate = grossIncome > 0
-        ? ((totalTax / grossIncome) * 100).toFixed(1)
-        : "0.0";
-
+    
+    // Fines based on state and offense
+    let fines: number;
+    if (offense === 'first') {
+        fines = Math.round(stateInfo.fineFirst * combinedMultiplier);
+    } else if (offense === 'second') {
+        fines = Math.round(stateInfo.fineSecond * combinedMultiplier);
+    } else {
+        fines = Math.round(stateInfo.fineSecond * 2 * combinedMultiplier);
+    }
+    
+    // DUI programs
+    const duiPrograms = Math.round(
+        (costs.duiSchool.min + costs.duiSchool.max) / 2 +
+        (costs.alcoholAssessment.min + costs.alcoholAssessment.max) / 2 +
+        (offense !== 'first' ? (costs.treatmentProgram.min + costs.treatmentProgram.max) / 2 : 0)
+    );
+    
+    // License related
+    const licenseRelated = Math.round(
+        (costs.licenseReinstatement.min + costs.licenseReinstatement.max) / 2 +
+        costs.srFiling.max * 12 * 3 // SR-22 for 3 years
+    );
+    
+    // IID costs
+    const iidMonths = offense === 'first' ? 6 : offense === 'second' ? 12 : 24;
+    const iidCosts = Math.round(
+        (costs.iidInstallation.min + costs.iidInstallation.max) / 2 +
+        ((costs.iidMonthly.min + costs.iidMonthly.max) / 2 * iidMonths)
+    );
+    
+    // Insurance increase over 3 years
+    const insuranceIncrease = Math.round(
+        costs.averageAnnualPremium * (costs.insuranceIncreasePercent / 100) * costs.insuranceYears
+    );
+    
+    // Towing & impound
+    const towingImpound = Math.round(
+        (costs.towing.min + costs.towing.max) / 2 +
+        ((costs.impoundPerDay.min + costs.impoundPerDay.max) / 2 * costs.impoundDays)
+    );
+    
+    // Lost wages
+    const lostWages = Math.round(costs.lostWageDays * costs.averageDailyWage * (offense === 'first' ? 1 : 2));
+    
+    // Calculate totals
+    const totalAverage = courtFees + lawyerFees + fines + duiPrograms + licenseRelated + iidCosts + insuranceIncrease + towingImpound + lostWages;
+    const totalMinimum = Math.round(totalAverage * 0.6);
+    const totalMaximum = Math.round(totalAverage * 1.5);
+    
     return {
-        grossIncome,
-        netEarnings: Math.round(netEarnings),
-        socialSecurityTax: Math.round(socialSecurityTax),
-        medicareTax: Math.round(medicareTax),
-        additionalMedicare: Math.round(additionalMedicare),
-        totalSETax: Math.round(totalSETax),
-        seDeduction: Math.round(seDeduction),
-        standardDeduction,
-        taxableIncome: Math.round(taxableIncome),
-        federalTax: Math.round(federalTax),
-        totalTax: Math.round(totalTax),
-        quarterlyPayment: Math.round(quarterlyPayment),
-        effectiveRate,
-        brackets,
+        state: stateInfo.name,
+        offense,
+        bac,
+        accident: hasAccident,
+        
+        courtFees,
+        lawyerFees,
+        fines,
+        duiPrograms,
+        licenseRelated,
+        iidCosts,
+        insuranceIncrease,
+        towingImpound,
+        lostWages,
+        
+        totalMinimum,
+        totalMaximum,
+        totalAverage,
+        
+        licenseSuspension: offense === 'first' ? stateInfo.licenseFirst : stateInfo.licenseSecond,
+        mandatoryJail: stateInfo.mandatoryJail || offense !== 'first',
     };
 }
 
 // ============================================
-// CALCULATOR DEFINITIONS (EXPANDABLE)
-// Add new calculators here - homepage auto-generates cards
+// CALCULATOR DEFINITIONS
 // ============================================
 export const CALCULATORS = [
     {
-        id: "1099-tax",
-        name: "1099 Tax Calculator",
-        shortName: "1099 Tax",
-        description: "Calculate self-employment taxes for freelancers",
-        longDescription:
-            "Free 2025 self-employment tax calculator. Calculates SE tax (15.3%), federal income tax, and quarterly estimated payments for 1099 contractors and freelancers.",
-        icon: FileText,
-        category: "tax",
-        keywords: ["1099", "self employment", "freelance", "quarterly tax", "SE tax"],
+        id: "dui-cost",
+        name: "DUI Cost Calculator",
+        shortName: "DUI Cost",
+        description: "Calculate the total cost of a DUI in your state",
+        longDescription: "Free 2025 DUI cost calculator. Estimate fines, lawyer fees, insurance increases, and total expenses for DUI/DWI charges in all 50 US states.",
+        icon: Scale,
+        category: "legal",
+        keywords: ["DUI cost", "DWI calculator", "drunk driving fine", "DUI lawyer cost", "DUI insurance"],
         featured: true,
     },
     {
-        id: "w2-vs-1099",
-        name: "W2 vs 1099 Calculator",
-        shortName: "W2 vs 1099",
-        description: "Compare W2 employee vs 1099 contractor take-home pay",
-        longDescription:
-            "Compare your take-home pay as a W2 employee vs 1099 contractor. See the tax differences and find your break-even hourly rate.",
-        icon: Calculator,
-        category: "tax",
-        keywords: ["W2", "1099", "employee vs contractor", "take home pay", "comparison"],
-        featured: true,
-    },
-    {
-        id: "quarterly-tax",
-        name: "Quarterly Tax Calculator",
-        shortName: "Quarterly Tax",
-        description: "Calculate quarterly estimated tax payments",
-        longDescription:
-            "Calculate your quarterly estimated tax payments for 2025. Never miss a deadline with payment schedule and amounts.",
-        icon: Calculator,
-        category: "tax",
-        keywords: ["quarterly tax", "estimated tax", "1040-ES", "tax deadlines"],
-        featured: true,
-    },
-    {
-        id: "paycheck",
-        name: "Paycheck Calculator",
-        shortName: "Paycheck",
-        description: "Calculate your net paycheck after taxes",
-        longDescription:
-            "Free paycheck calculator for W2 employees. See your gross pay, tax withholdings, and net take-home pay.",
-        icon: Wallet,
-        category: "salary",
-        keywords: ["paycheck", "salary", "take home pay", "net pay", "withholding"],
+        id: "dui-insurance",
+        name: "DUI Insurance Calculator",
+        shortName: "Insurance",
+        description: "See how a DUI affects your car insurance rates",
+        longDescription: "Calculate how much your car insurance will increase after a DUI conviction. See 3-year cost projections.",
+        icon: Shield,
+        category: "insurance",
+        keywords: ["DUI insurance", "SR-22", "insurance increase", "high risk insurance"],
         featured: false,
     },
     {
-        id: "hourly-rate",
-        name: "Freelance Hourly Rate Calculator",
-        shortName: "Hourly Rate",
-        description: "Calculate your freelance hourly rate",
-        longDescription:
-            "Calculate the hourly rate you need to charge as a freelancer to meet your income goals after taxes and expenses.",
-        icon: TrendingUp,
-        category: "freelance",
-        keywords: ["hourly rate", "freelance rate", "consulting rate", "billing rate"],
-        featured: false,
-    },
-    {
-        id: "llc-vs-scorp",
-        name: "LLC vs S-Corp Tax Calculator",
-        shortName: "LLC vs S-Corp",
-        description: "Compare LLC vs S-Corp tax savings",
-        longDescription:
-            "Compare tax obligations as an LLC vs S-Corporation. See potential tax savings and find the best structure for your business.",
-        icon: Home,
-        category: "business",
-        keywords: ["LLC", "S-Corp", "business structure", "tax savings", "self employment tax"],
+        id: "dui-penalties",
+        name: "DUI Penalties by State",
+        shortName: "Penalties",
+        description: "Compare DUI penalties across all 50 states",
+        longDescription: "Look up DUI fines, jail time, license suspension, and other penalties for your state.",
+        icon: FileWarning,
+        category: "legal",
+        keywords: ["DUI penalties", "DWI laws", "state DUI laws", "drunk driving punishment"],
         featured: false,
     },
 ] as const;
@@ -251,4 +284,9 @@ export function formatNumber(value: number): string {
 
 export function parseFormattedNumber(value: string): number {
     return parseInt(value.replace(/[^0-9]/g, "")) || 0;
+}
+
+// Get all state codes
+export function getStateCodes(): string[] {
+    return Object.keys(STATE_DATA).filter(code => code !== 'OTHER');
 }

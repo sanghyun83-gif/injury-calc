@@ -1,24 +1,24 @@
-import { MetadataRoute } from "next";
-import { CALCULATORS, SITE } from "./site-config";
+import type { MetadataRoute } from "next";
+import { SITE, CALCULATORS } from "./site-config";
+
+const baseUrl = SITE.baseUrl;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = "https://fin-calc-seven.vercel.app";
-
-    // Generate calculator URLs from config
-    const calculatorUrls = CALCULATORS.map((calc) => ({
-        url: `${baseUrl}/${calc.id}`,
-        lastModified: new Date(),
-        changeFrequency: "monthly" as const,
-        priority: 0.9,
-    }));
-
-    return [
+    const staticPages = [
         {
             url: baseUrl,
             lastModified: new Date(),
-            changeFrequency: "weekly" as const,
-            priority: 1.0,
+            changeFrequency: "monthly" as const,
+            priority: 1,
         },
-        ...calculatorUrls,
     ];
+
+    const calculatorPages = CALCULATORS.map((calc) => ({
+        url: `${baseUrl}/${calc.id}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: calc.featured ? 0.9 : 0.8,
+    }));
+
+    return [...staticPages, ...calculatorPages];
 }
