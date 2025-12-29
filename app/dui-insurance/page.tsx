@@ -93,7 +93,7 @@ export default function DUIInsurancePage() {
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
                     <div className="flex items-center gap-2">
-                        <Shield className="w-5 h-5 text-red-500" />
+                        <Shield className="w-5 h-5 text-amber-500" />
                         <span className="text-lg font-bold text-white">DUI Insurance Calculator</span>
                     </div>
                     <span className="ml-auto text-xs text-slate-400 bg-slate-700 px-2 py-1 rounded">
@@ -122,7 +122,7 @@ export default function DUIInsurancePage() {
                             <select
                                 value={state}
                                 onChange={(e) => setState(e.target.value)}
-                                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                             >
                                 <option value="">-- Select State --</option>
                                 {stateCodes.map((code) => (
@@ -133,7 +133,7 @@ export default function DUIInsurancePage() {
                                 <option value="OTHER">Other State (+80%)</option>
                             </select>
                             {selectedStateRate && (
-                                <p className="text-xs text-red-400 mt-1">
+                                <p className="text-xs text-amber-400 mt-1">
                                     {STATE_DATA[state].name}: Average +{selectedStateRate}% insurance increase after DUI
                                 </p>
                             )}
@@ -152,7 +152,7 @@ export default function DUIInsurancePage() {
                                     onChange={handleInputChange}
                                     onKeyDown={(e) => e.key === "Enter" && handleCalculate()}
                                     placeholder={DUI_COSTS_2025.averageAnnualPremium.toLocaleString()}
-                                    className="w-full pl-8 pr-4 py-4 text-lg bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
+                                    className="w-full pl-8 pr-4 py-4 text-lg bg-slate-700 border border-slate-600 rounded-lg text-white focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
                                 />
                             </div>
                             <p className="text-xs text-slate-500 mt-1">
@@ -176,8 +176,8 @@ export default function DUIInsurancePage() {
                                         type="button"
                                         onClick={() => setOffense(opt.value as "first" | "second" | "third")}
                                         className={`py-3 px-2 rounded-lg border font-medium transition text-center ${offense === opt.value
-                                                ? "bg-red-600 text-white border-red-600"
-                                                : "bg-slate-700 text-slate-300 border-slate-600 hover:border-red-500"
+                                            ? "bg-amber-600 text-white border-amber-600"
+                                            : "bg-slate-700 text-slate-300 border-slate-600 hover:border-amber-500"
                                             }`}
                                     >
                                         <div className="text-sm">{opt.label}</div>
@@ -190,7 +190,7 @@ export default function DUIInsurancePage() {
                     {/* Calculate Button */}
                     <button
                         onClick={handleCalculate}
-                        className="w-full py-4 bg-red-600 text-white rounded-lg font-semibold text-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-4 bg-amber-600 text-white rounded-lg font-semibold text-lg hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
                     >
                         <Calculator className="w-5 h-5" />
                         Calculate Insurance Impact
@@ -201,12 +201,12 @@ export default function DUIInsurancePage() {
                 {result && (
                     <div className="mt-6 bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
                         {/* Summary Header */}
-                        <div className="bg-gradient-to-r from-red-600 to-red-800 text-white p-6">
-                            <p className="text-sm text-red-200 mb-1">
+                        <div className="bg-gradient-to-r from-amber-600 to-orange-700 text-white p-6">
+                            <p className="text-sm text-amber-100 mb-1">
                                 {result.stateName} - Your New Annual Premium
                             </p>
                             <p className="text-4xl font-bold">{formatCurrency(result.newAnnual)}/yr</p>
-                            <p className="text-sm text-red-200 mt-2 flex items-center gap-2">
+                            <p className="text-sm text-amber-100 mt-2 flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4" />
                                 +{result.increasePercent}% increase ({formatCurrency(result.yearlyIncrease)}/yr extra)
                             </p>
@@ -217,12 +217,12 @@ export default function DUIInsurancePage() {
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="bg-slate-700/50 rounded-lg p-4 text-center">
                                     <p className="text-slate-400 text-sm">3-Year Cost</p>
-                                    <p className="text-2xl font-bold text-red-400">{formatCurrency(result.threeYearTotal)}</p>
+                                    <p className="text-2xl font-bold text-amber-400">{formatCurrency(result.threeYearTotal)}</p>
                                     <p className="text-xs text-slate-500">SR-22 period</p>
                                 </div>
                                 <div className="bg-slate-700/50 rounded-lg p-4 text-center">
                                     <p className="text-slate-400 text-sm">5-Year Cost</p>
-                                    <p className="text-2xl font-bold text-red-400">{formatCurrency(result.fiveYearTotal)}</p>
+                                    <p className="text-2xl font-bold text-amber-400">{formatCurrency(result.fiveYearTotal)}</p>
                                     <p className="text-xs text-slate-500">Total impact</p>
                                 </div>
                             </div>
@@ -239,28 +239,28 @@ export default function DUIInsurancePage() {
                                 </div>
                                 <div className="flex justify-between py-2 border-b border-slate-700">
                                     <span className="text-slate-300">Rate Increase (+{result.increasePercent}%)</span>
-                                    <span className="font-medium text-red-400">+{formatCurrency(result.yearlyIncrease)}/yr</span>
+                                    <span className="font-medium text-amber-400">+{formatCurrency(result.yearlyIncrease)}/yr</span>
                                 </div>
                                 <div className="flex justify-between py-2 border-b border-slate-700">
                                     <span className="text-slate-300">SR-22 Filing Fees</span>
-                                    <span className="font-medium text-red-400">+{formatCurrency(result.sr22Fee)}/yr</span>
+                                    <span className="font-medium text-amber-400">+{formatCurrency(result.sr22Fee)}/yr</span>
                                 </div>
                                 <div className="flex justify-between py-2 border-b border-slate-700">
                                     <span className="text-white font-medium">New Annual Premium</span>
-                                    <span className="font-bold text-red-400">{formatCurrency(result.newAnnual)}</span>
+                                    <span className="font-bold text-amber-400">{formatCurrency(result.newAnnual)}</span>
                                 </div>
                                 <div className="flex justify-between pt-4 text-lg">
                                     <span className="text-white font-bold">5-Year Extra Cost</span>
-                                    <span className="font-bold text-red-400">{formatCurrency(result.totalExtraCost)}</span>
+                                    <span className="font-bold text-amber-400">{formatCurrency(result.totalExtraCost)}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Warning */}
-                        <div className="p-4 bg-red-900/30 border-t border-red-700/50">
+                        <div className="p-4 bg-amber-900/30 border-t border-amber-700/50">
                             <div className="flex items-start gap-2 text-sm">
-                                <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5" />
-                                <p className="text-red-200">
+                                <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5" />
+                                <p className="text-amber-200">
                                     Some insurers may cancel your policy. You may need to find a new high-risk insurer at even higher rates.
                                 </p>
                             </div>
@@ -276,7 +276,7 @@ export default function DUIInsurancePage() {
                 {/* FAQ Section */}
                 <section className="bg-slate-800 rounded-xl border border-slate-700 p-6">
                     <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <Info className="w-5 h-5 text-red-500" />
+                        <Info className="w-5 h-5 text-amber-500" />
                         Frequently Asked Questions
                     </h2>
 
