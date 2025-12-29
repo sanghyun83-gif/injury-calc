@@ -1,24 +1,29 @@
-import type { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
 import { SITE, CALCULATORS } from "./site-config";
 
-const baseUrl = SITE.baseUrl;
-
 export default function sitemap(): MetadataRoute.Sitemap {
-    const staticPages = [
+    const baseUrl = SITE.baseUrl;
+    const now = new Date();
+
+    // Homepage
+    const routes: MetadataRoute.Sitemap = [
         {
             url: baseUrl,
-            lastModified: new Date(),
-            changeFrequency: "monthly" as const,
-            priority: 1,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: 1.0,
         },
     ];
 
-    const calculatorPages = CALCULATORS.map((calc) => ({
-        url: `${baseUrl}/${calc.id}`,
-        lastModified: new Date(),
-        changeFrequency: "monthly" as const,
-        priority: calc.featured ? 0.9 : 0.8,
-    }));
+    // Calculator pages from config
+    CALCULATORS.forEach((calc) => {
+        routes.push({
+            url: `${baseUrl}/${calc.id}`,
+            lastModified: now,
+            changeFrequency: "monthly",
+            priority: calc.featured ? 0.9 : 0.8,
+        });
+    });
 
-    return [...staticPages, ...calculatorPages];
+    return routes;
 }

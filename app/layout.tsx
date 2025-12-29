@@ -10,23 +10,20 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: `${SITE.name} | Free DUI Cost Calculator 2025`,
+  title: `${SITE.name} | Free Settlement Calculator 2025`,
   description: SITE.description,
   keywords: [
-    "DUI cost calculator",
-    "DWI calculator",
-    "drunk driving cost",
-    "DUI lawyer fees",
-    "DUI insurance increase",
-    "DUI fines by state",
-    "SR-22 insurance",
+    "personal injury calculator",
+    "settlement calculator",
+    "injury settlement",
+    "car accident settlement",
+    "pain and suffering calculator",
+    "injury compensation",
+    "insurance claim calculator",
   ],
-  verification: {
-    google: "qlPMVO_Hb-be3_hFHNT9SBbsHO-b_wCOfWfLmTb4EQc",
-  },
   openGraph: {
-    title: "Free DUI Cost Calculator 2025 | DUI Calculator",
-    description: "Calculate the true cost of a DUI in your state. Fines, lawyer fees, insurance increases, and more.",
+    title: "Free Personal Injury Settlement Calculator 2025",
+    description: "Calculate the value of your injury claim. Free calculator for car accidents, slip and fall, and more.",
     type: "website",
   },
 };

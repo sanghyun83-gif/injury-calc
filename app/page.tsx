@@ -1,190 +1,216 @@
-"use client";
-
 import Link from "next/link";
-import { Scale, AlertTriangle, ArrowRight, Shield, FileWarning } from "lucide-react";
-import { SITE, CALCULATORS } from "./site-config";
+import { SITE, CALCULATORS, INJURY_CONSTANTS_2025, formatCurrency } from "./site-config";
+import { ArrowRight, Shield, Scale, TrendingUp, Clock, Users } from "lucide-react";
 
-export default function HomePage() {
+export default function Home() {
+  const featuredCalculators = CALCULATORS.filter(c => c.featured);
+  const otherCalculators = CALCULATORS.filter(c => !c.featured);
+
   return (
     <div className="min-h-screen bg-slate-900">
-      {/* Hero Section */}
-      <header className="bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white">
-        <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Scale className="w-10 h-10 text-red-400" />
-            <h1 className="text-3xl md:text-4xl font-bold">{SITE.name}</h1>
+      {/* Header */}
+      <header className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Scale className="w-6 h-6 text-emerald-500" />
+            <span className="text-lg font-bold text-white">{SITE.name}</span>
           </div>
-
-          <p className="text-xl text-slate-300 mb-4">
-            Free DUI Cost Calculator for All 50 States
-          </p>
-
-          <p className="text-slate-400 max-w-2xl mx-auto mb-8">
-            {SITE.description}
-          </p>
-
-          {/* Warning Badge */}
-          <div className="inline-flex items-center gap-2 bg-red-900/50 text-red-300 px-4 py-2 rounded-full text-sm mb-8">
-            <AlertTriangle className="w-4 h-4" />
-            Average DUI costs $10,000 - $25,000+
-          </div>
-
-          {/* CTA Button */}
-          <div>
-            <Link
-              href="/dui-cost"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all shadow-lg shadow-red-900/50"
-            >
-              <Scale className="w-5 h-5" />
-              Calculate Your DUI Cost
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-          </div>
-
-          <p className="text-xs text-slate-500 mt-4">
-            Updated for {SITE.year} • No signup required
-          </p>
+          <span className="text-xs text-slate-400 bg-slate-700 px-2 py-1 rounded">
+            {SITE.year} Data
+          </span>
         </div>
       </header>
 
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 via-slate-900 to-blue-900/20" />
+        <div className="relative max-w-4xl mx-auto px-4 py-16 text-center">
+          <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-2 mb-6">
+            <Shield className="w-4 h-4 text-emerald-400" />
+            <span className="text-sm text-emerald-300">Free {SITE.year} Calculator</span>
+          </div>
+
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Personal Injury
+            <span className="text-emerald-400"> Settlement Calculator</span>
+          </h1>
+
+          <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
+            Estimate the value of your injury claim in seconds.
+            Calculate compensation for medical bills, lost wages, and pain & suffering.
+          </p>
+
+          <Link
+            href="/injury-settlement"
+            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:scale-105"
+          >
+            Calculate Your Settlement
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
       {/* Stats Section */}
-      <section className="bg-slate-800 py-8 border-y border-slate-700">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-2xl md:text-3xl font-bold text-red-400">1.5M</p>
-              <p className="text-sm text-slate-400">DUI Arrests/Year</p>
+      <section className="bg-slate-800/50 border-y border-slate-700">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-emerald-400">
+                {formatCurrency(INJURY_CONSTANTS_2025.avgSettlements.carAccident.avg)}
+              </p>
+              <p className="text-sm text-slate-400 mt-1">Avg Car Accident Settlement</p>
             </div>
-            <div>
-              <p className="text-2xl md:text-3xl font-bold text-red-400">$15K+</p>
-              <p className="text-sm text-slate-400">Average Cost</p>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-blue-400">33%</p>
+              <p className="text-sm text-slate-400 mt-1">Typical Attorney Fee</p>
             </div>
-            <div>
-              <p className="text-2xl md:text-3xl font-bold text-red-400">3 Years</p>
-              <p className="text-sm text-slate-400">Insurance Impact</p>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-amber-400">2-5x</p>
+              <p className="text-sm text-slate-400 mt-1">Pain & Suffering Multiplier</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-purple-400">98%</p>
+              <p className="text-sm text-slate-400 mt-1">Cases Settle Out of Court</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Calculator Cards */}
-      <main className="max-w-4xl mx-auto px-4 py-12">
-        <h2 className="text-xl font-bold text-white mb-6 text-center">
-          DUI Calculators & Tools
+      {/* Featured Calculators */}
+      <section className="max-w-6xl mx-auto px-4 py-16">
+        <h2 className="text-2xl font-bold text-white mb-8 text-center">
+          Free Injury Calculators
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          {CALCULATORS.map((calc) => {
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          {featuredCalculators.map((calc) => {
             const IconComponent = calc.icon;
             return (
               <Link
                 key={calc.id}
                 href={`/${calc.id}`}
-                className={`bg-slate-800 hover:bg-slate-750 border ${calc.featured ? 'border-red-600' : 'border-slate-700'
-                  } rounded-xl p-6 transition-all hover:border-red-500 group`}
+                className="group bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-emerald-500/50 transition-all hover:bg-slate-800/80"
               >
                 <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-lg ${calc.featured ? 'bg-red-900/50' : 'bg-slate-700'
-                    }`}>
-                    <IconComponent className={`w-6 h-6 ${calc.featured ? 'text-red-400' : 'text-slate-400'
-                      }`} />
+                  <div className="p-3 bg-emerald-500/10 rounded-lg group-hover:bg-emerald-500/20 transition-colors">
+                    <IconComponent className="w-6 h-6 text-emerald-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-white group-hover:text-red-400 transition-colors">
+                    <h3 className="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors">
                       {calc.name}
-                      {calc.featured && (
-                        <span className="ml-2 text-xs bg-red-600 text-white px-2 py-0.5 rounded">
-                          Popular
-                        </span>
-                      )}
                     </h3>
                     <p className="text-sm text-slate-400 mt-1">
                       {calc.description}
                     </p>
+                    <span className="inline-flex items-center gap-1 text-emerald-400 text-sm mt-3 group-hover:gap-2 transition-all">
+                      Calculate Now <ArrowRight className="w-4 h-4" />
+                    </span>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-slate-600 group-hover:text-red-400 transition-colors" />
                 </div>
               </Link>
             );
           })}
         </div>
-      </main>
 
-      {/* What's Included Section */}
-      <section className="bg-slate-800 py-12 border-y border-slate-700">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl font-bold text-white mb-8 text-center">
-            What&apos;s Included in a DUI Cost?
-          </h2>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { label: "Court Fines", range: "$500 - $5,000" },
-              { label: "Lawyer Fees", range: "$2,500 - $10,000" },
-              { label: "Insurance Increase", range: "$4,000 - $10,000" },
-              { label: "DUI Programs", range: "$500 - $2,000" },
-              { label: "License Fees", range: "$200 - $800" },
-              { label: "Ignition Interlock", range: "$500 - $2,000" },
-            ].map((item, i) => (
-              <div key={i} className="bg-slate-900 rounded-lg p-4 border border-slate-700">
-                <p className="text-slate-400 text-sm">{item.label}</p>
-                <p className="text-white font-semibold mt-1">{item.range}</p>
-              </div>
-            ))}
+        {/* Other Calculators */}
+        {otherCalculators.length > 0 && (
+          <div className="grid md:grid-cols-3 gap-4">
+            {otherCalculators.map((calc) => {
+              const IconComponent = calc.icon;
+              return (
+                <Link
+                  key={calc.id}
+                  href={`/${calc.id}`}
+                  className="group bg-slate-800/50 border border-slate-700 rounded-lg p-4 hover:border-emerald-500/50 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <IconComponent className="w-5 h-5 text-slate-400 group-hover:text-emerald-400" />
+                    <span className="text-sm text-slate-300 group-hover:text-white">
+                      {calc.shortName}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
-        </div>
+        )}
       </section>
 
-      {/* Disclaimer */}
-      <section className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-amber-900/30 border border-amber-700/50 rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5" />
-            <div>
-              <p className="text-amber-200 font-medium">Legal Disclaimer</p>
-              <p className="text-amber-300/70 text-sm mt-1">
-                This calculator provides estimates only. Actual DUI costs vary by state, case circumstances, and legal representation. This is not legal advice. Consult a qualified DUI attorney for your specific situation.
+      {/* How Settlement Works */}
+      <section className="bg-slate-800/30 border-y border-slate-700">
+        <div className="max-w-4xl mx-auto px-4 py-16">
+          <h2 className="text-2xl font-bold text-white mb-8 text-center">
+            How Injury Settlements Are Calculated
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+              <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-xl font-bold text-blue-400">1</span>
+              </div>
+              <h3 className="font-semibold text-white mb-2">Economic Damages</h3>
+              <p className="text-sm text-slate-400">
+                Medical bills + lost wages + future medical costs = your economic damages
+              </p>
+            </div>
+
+            <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+              <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-xl font-bold text-emerald-400">2</span>
+              </div>
+              <h3 className="font-semibold text-white mb-2">Pain & Suffering</h3>
+              <p className="text-sm text-slate-400">
+                Medical bills × multiplier (1.5-5x) based on injury severity
+              </p>
+            </div>
+
+            <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+              <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-xl font-bold text-amber-400">3</span>
+              </div>
+              <h3 className="font-semibold text-white mb-2">Total Settlement</h3>
+              <p className="text-sm text-slate-400">
+                Total value minus attorney fees (33%) = your net settlement
               </p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="max-w-4xl mx-auto px-4 py-16 text-center">
+        <h2 className="text-2xl font-bold text-white mb-4">
+          Find Out What Your Case Is Worth
+        </h2>
+        <p className="text-slate-400 mb-8">
+          Get a free estimate in under 2 minutes. No email required.
+        </p>
+        <Link
+          href="/injury-settlement"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-semibold transition-colors"
+        >
+          Start Free Calculator
+          <ArrowRight className="w-5 h-5" />
+        </Link>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-slate-900 border-t border-slate-800 py-8">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Scale className="w-5 h-5 text-red-500" />
-            <span className="font-semibold text-white">{SITE.name}</span>
+      <footer className="bg-slate-800 border-t border-slate-700">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Scale className="w-5 h-5 text-emerald-500" />
+              <span className="font-semibold text-white">{SITE.name}</span>
+            </div>
+            <p className="text-sm text-slate-400 text-center">
+              For informational purposes only. Not legal advice. Consult an attorney for your specific case.
+            </p>
+            <p className="text-sm text-slate-500">
+              © {SITE.year} {SITE.name}
+            </p>
           </div>
-          <p className="text-sm text-slate-500">
-            Free DUI Cost Calculator • {SITE.year} Data • All 50 States
-          </p>
-          <p className="text-xs text-slate-600 mt-2">
-            © {SITE.year} {SITE.name}. For informational purposes only.
-          </p>
         </div>
       </footer>
-
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            name: SITE.name,
-            description: SITE.description,
-            applicationCategory: "FinanceApplication",
-            operatingSystem: "Any",
-            offers: {
-              "@type": "Offer",
-              price: "0",
-              priceCurrency: "USD",
-            },
-          }),
-        }}
-      />
     </div>
   );
 }
