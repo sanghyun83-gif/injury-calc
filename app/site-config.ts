@@ -27,40 +27,40 @@ export const DUI_COSTS_2025 = {
     lawyerFirstOffense: { min: 2500, max: 5000 },
     lawyerSecondOffense: { min: 5000, max: 10000 },
     lawyerThirdOffense: { min: 10000, max: 25000 },
-    
+
     // Fines (varies widely by state)
     fineFirstOffense: { min: 500, max: 2000 },
     fineSecondOffense: { min: 1000, max: 5000 },
     fineThirdOffense: { min: 2000, max: 10000 },
-    
+
     // DUI Programs
     duiSchool: { min: 250, max: 800 },
     alcoholAssessment: { min: 100, max: 300 },
     treatmentProgram: { min: 1000, max: 5000 },
-    
+
     // DMV & License
     licenseReinstatement: { min: 100, max: 500 },
     srFiling: { min: 15, max: 50 }, // SR-22 filing fee
-    
+
     // Ignition Interlock Device (IID)
     iidInstallation: { min: 100, max: 200 },
     iidMonthly: { min: 75, max: 150 },
     iidDuration: { months: 6 }, // minimum for first offense
-    
+
     // Insurance Impact (3 years)
     insuranceIncreasePercent: 80, // Average 80% increase
     averageAnnualPremium: 1800,
     insuranceYears: 3,
-    
+
     // Jail & Bail
     bailFirstOffense: { min: 500, max: 2500 },
     bailSecondOffense: { min: 2500, max: 10000 },
-    
+
     // Towing & Impound
     towing: { min: 150, max: 400 },
     impoundPerDay: { min: 30, max: 75 },
     impoundDays: 3, // average
-    
+
     // Lost Wages (during court, classes, license suspension)
     lostWageDays: 3,
     averageDailyWage: 200,
@@ -101,7 +101,7 @@ export interface DUICalculationResult {
     offense: 'first' | 'second' | 'third';
     bac: number;
     accident: boolean;
-    
+
     // Cost breakdown
     courtFees: number;
     lawyerFees: number;
@@ -112,12 +112,12 @@ export interface DUICalculationResult {
     insuranceIncrease: number;
     towingImpound: number;
     lostWages: number;
-    
+
     // Totals
     totalMinimum: number;
     totalMaximum: number;
     totalAverage: number;
-    
+
     // Additional info
     licenseSuspension: string;
     mandatoryJail: boolean;
@@ -134,15 +134,15 @@ export function calculateDUICost(
 ): DUICalculationResult {
     const costs = DUI_COSTS_2025;
     const stateInfo = STATE_DATA[stateCode] || STATE_DATA.OTHER;
-    
+
     // Multiplier for high BAC (over 0.15)
     const highBACMultiplier = bac >= 0.15 ? 1.5 : 1;
     const accidentMultiplier = hasAccident ? 1.3 : 1;
     const combinedMultiplier = highBACMultiplier * accidentMultiplier;
-    
+
     // Court fees
     const courtFees = Math.round((costs.courtFiling.min + costs.courtFiling.max) / 2);
-    
+
     // Lawyer fees based on offense
     let lawyerFees: number;
     if (offense === 'first') {
@@ -152,7 +152,7 @@ export function calculateDUICost(
     } else {
         lawyerFees = Math.round((costs.lawyerThirdOffense.min + costs.lawyerThirdOffense.max) / 2 * combinedMultiplier);
     }
-    
+
     // Fines based on state and offense
     let fines: number;
     if (offense === 'first') {
@@ -162,52 +162,52 @@ export function calculateDUICost(
     } else {
         fines = Math.round(stateInfo.fineSecond * 2 * combinedMultiplier);
     }
-    
+
     // DUI programs
     const duiPrograms = Math.round(
         (costs.duiSchool.min + costs.duiSchool.max) / 2 +
         (costs.alcoholAssessment.min + costs.alcoholAssessment.max) / 2 +
         (offense !== 'first' ? (costs.treatmentProgram.min + costs.treatmentProgram.max) / 2 : 0)
     );
-    
+
     // License related
     const licenseRelated = Math.round(
         (costs.licenseReinstatement.min + costs.licenseReinstatement.max) / 2 +
         costs.srFiling.max * 12 * 3 // SR-22 for 3 years
     );
-    
+
     // IID costs
     const iidMonths = offense === 'first' ? 6 : offense === 'second' ? 12 : 24;
     const iidCosts = Math.round(
         (costs.iidInstallation.min + costs.iidInstallation.max) / 2 +
         ((costs.iidMonthly.min + costs.iidMonthly.max) / 2 * iidMonths)
     );
-    
+
     // Insurance increase over 3 years
     const insuranceIncrease = Math.round(
         costs.averageAnnualPremium * (costs.insuranceIncreasePercent / 100) * costs.insuranceYears
     );
-    
+
     // Towing & impound
     const towingImpound = Math.round(
         (costs.towing.min + costs.towing.max) / 2 +
         ((costs.impoundPerDay.min + costs.impoundPerDay.max) / 2 * costs.impoundDays)
     );
-    
+
     // Lost wages
     const lostWages = Math.round(costs.lostWageDays * costs.averageDailyWage * (offense === 'first' ? 1 : 2));
-    
+
     // Calculate totals
     const totalAverage = courtFees + lawyerFees + fines + duiPrograms + licenseRelated + iidCosts + insuranceIncrease + towingImpound + lostWages;
     const totalMinimum = Math.round(totalAverage * 0.6);
     const totalMaximum = Math.round(totalAverage * 1.5);
-    
+
     return {
         state: stateInfo.name,
         offense,
         bac,
         accident: hasAccident,
-        
+
         courtFees,
         lawyerFees,
         fines,
@@ -217,11 +217,11 @@ export function calculateDUICost(
         insuranceIncrease,
         towingImpound,
         lostWages,
-        
+
         totalMinimum,
         totalMaximum,
         totalAverage,
-        
+
         licenseSuspension: offense === 'first' ? stateInfo.licenseFirst : stateInfo.licenseSecond,
         mandatoryJail: stateInfo.mandatoryJail || offense !== 'first',
     };
@@ -243,25 +243,14 @@ export const CALCULATORS = [
         featured: true,
     },
     {
-        id: "dui-insurance",
-        name: "DUI Insurance Calculator",
-        shortName: "Insurance",
-        description: "See how a DUI affects your car insurance rates",
-        longDescription: "Calculate how much your car insurance will increase after a DUI conviction. See 3-year cost projections.",
-        icon: Shield,
-        category: "insurance",
-        keywords: ["DUI insurance", "SR-22", "insurance increase", "high risk insurance"],
-        featured: false,
-    },
-    {
-        id: "dui-penalties",
-        name: "DUI Penalties by State",
-        shortName: "Penalties",
-        description: "Compare DUI penalties across all 50 states",
-        longDescription: "Look up DUI fines, jail time, license suspension, and other penalties for your state.",
+        id: "dui-comparison",
+        name: "DUI Laws by State",
+        shortName: "Compare States",
+        description: "Compare DUI fines, penalties & insurance by state",
+        longDescription: "Compare DUI laws, fines, license suspension, and insurance increases across all 50 US states in one simple table.",
         icon: FileWarning,
         category: "legal",
-        keywords: ["DUI penalties", "DWI laws", "state DUI laws", "drunk driving punishment"],
+        keywords: ["DUI laws by state", "DUI penalties comparison", "state DUI fines", "DUI insurance by state"],
         featured: false,
     },
 ] as const;
