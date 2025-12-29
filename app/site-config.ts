@@ -162,6 +162,17 @@ export const CALCULATORS = [
         keywords: ["insurance claim calculator", "car accident claim", "bodily injury claim", "property damage claim"],
         featured: false,
     },
+    {
+        id: "car-accident",
+        name: "Car Accident Calculator",
+        shortName: "Car Accident",
+        description: "Calculate your car accident settlement value",
+        longDescription: "Free 2025 car accident settlement calculator. Estimate compensation for vehicle damage, injuries, and pain & suffering.",
+        icon: Car,
+        category: "legal",
+        keywords: ["car accident calculator", "auto accident settlement", "car crash compensation", "vehicle accident claim"],
+        featured: true,
+    },
 ] as const;
 
 // ============================================
