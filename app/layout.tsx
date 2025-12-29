@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     "injury compensation",
     "insurance claim calculator",
   ],
+  verification: {
+    google: "qlPMVO_Hb-be3_hFHNT9SBbsHO-b_wCOfWfLmTb4EQc",
+  },
   openGraph: {
     title: "Free Personal Injury Settlement Calculator 2025",
     description: "Calculate the value of your injury claim. Free calculator for car accidents, slip and fall, and more.",
