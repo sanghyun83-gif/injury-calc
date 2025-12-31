@@ -14,7 +14,7 @@ export const SITE = {
     tagline: "Free Settlement Estimator",
     description: "Calculate the value of your personal injury settlement. Free 2025 calculator for car accidents, slip and fall, medical malpractice, and more.",
     year: 2025,
-    baseUrl: "https://injury-calc.vercel.app",
+    baseUrl: "https://injury.mysmartcalculators.com",
 };
 
 // ============================================
